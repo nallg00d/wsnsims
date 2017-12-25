@@ -15,7 +15,7 @@ Setup
 
 This project can be set up using standard Python tools. It relies on vanilla
 Python 3.5+ as its interpreter. It is highly recommended that you install this
-package in a virtual environment.::
+package in a virtual environment(VirtualEnv or Miniconda works great).::
 
     $ git clone https://<projecturl>/wsnsims.git
     $ pip install -e wsnsims
