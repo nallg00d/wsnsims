@@ -16,6 +16,7 @@ from wsnsims.flower.flower_sim import FLOWER
 from wsnsims.focus.focus_sim import FOCUS
 from wsnsims.minds.minds_sim import MINDS
 from wsnsims.tocs.tocs_sim import TOCS
+from wsnsims.loaf.loaf_sim import LOAF
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -71,7 +72,9 @@ def run_tocs(parameters):
     print("Finished ToCS in {} seconds".format(time.time() - start))
     return results
 
+def run_loaf(parameters):
 
+    
 def run_flower(parameters):
     """
 
@@ -87,12 +90,12 @@ def run_flower(parameters):
     env.isdvsd = parameters.isdvsd
     env.comms_range = parameters.radio_range
 
-    flower_sim = FLOWER(env)
+    loaf_sim = LOAF(env)
     print(
-        "Starting FLOWER at {}".format(datetime.datetime.now().isoformat()))
+        "Starting LOAF at {}".format(datetime.datetime.now().isoformat()))
     print("Using {}".format(parameters))
     start = time.time()
-    runner = flower_sim.run()
+    runner = loaf_sim.run()
 
     results = Results(runner.maximum_communication_delay(),
                       runner.energy_balance(),
@@ -100,7 +103,7 @@ def run_flower(parameters):
                       runner.average_energy(),
                       runner.max_buffer_size())
 
-    print("Finished FLOWER in {} seconds".format(time.time() - start))
+    print("Finished LOAF in {} seconds".format(time.time() - start))
     return results
 
 
