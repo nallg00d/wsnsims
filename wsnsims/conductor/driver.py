@@ -16,7 +16,7 @@ from wsnsims.flower.flower_sim import FLOWER
 from wsnsims.focus.focus_sim import FOCUS
 from wsnsims.minds.minds_sim import MINDS
 from wsnsims.tocs.tocs_sim import TOCS
-from wsnsims.tocs.loaf_sim import LOAF
+from wsnsims.loaf.loaf_sim import LOAF
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
