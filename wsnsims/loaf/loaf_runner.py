@@ -2,24 +2,24 @@ import logging
 
 import numpy as np
 
-from wsnsims.flower.energy import FLOWEREnergyModel
-from wsnsims.flower.movement import FLOWERMovementModel
+from wsnsims.loaf.energy import LOAFEnergyModel
+from wsnsims.loaf.movement import LOAFMovementModel
 
-from wsnsims.flower import data
+from wsnsims.loaf import data
 
 logger = logging.getLogger(__name__)
 
 
-class FLOWERRunnerError(Exception):
+class LOAFRunnerError(Exception):
     pass
 
 
-class FLOWERRunner(object):
+class LOAFRunner(object):
     def __init__(self, sim, environment):
         """
 
         :param sim: The simulation after a run of ToCS
-        :type sim: flower.flower_sim.FLOWER
+        :type sim: loaf.loaf_sim.LOAF
         :param environment:
         :type environment: core.environment.Environment
         """
@@ -27,8 +27,8 @@ class FLOWERRunner(object):
         self.sim = sim
         self.env = environment
 
-        self.movement_model = FLOWERMovementModel(self.sim, self.env)
-        self.energy_model = FLOWEREnergyModel(self.sim, self.env)
+        self.movement_model = LOAFMovementModel(self.sim, self.env)
+        self.energy_model = LOAFEnergyModel(self.sim, self.env)
 
     def maximum_communication_delay(self):
         """
@@ -57,17 +57,17 @@ class FLOWERRunner(object):
             if cell in cluster.cells:
                 return cluster
 
-        raise FLOWERRunnerError("No cluster found for %s", cell)
+        raise LOAFRunnerError("No cluster found for %s", cell)
 
     def communication_delay(self, begin, end):
         """
         Compute the communication delay between any two segments. This is done
-        as per Equation 1 in FLOWER.
+        as per Equation 1 in LOAF.
 
         :param begin:
-        :type begin: flower.cell.Cell
+        :type begin: loaf.cell.Cell
         :param end:
-        :type end: flower.cell.Cell
+        :type end: loaf.cell.Cell
 
         :return: The total communication delay in seconds
         :rtype: pq.second
@@ -99,9 +99,9 @@ class FLOWERRunner(object):
         """
 
         :param begin:
-        :type begin: flower.cell.Cell
+        :type begin: loaf.cell.Cell
         :param end:
-        :type end: flower.cell.Cell
+        :type end: loaf.cell.Cell
         :return:
         :rtype: pq.second
         """
@@ -133,7 +133,7 @@ class FLOWERRunner(object):
         """
 
         :param cluster:
-        :type cluster: flower.cluster.FLOWERCluster
+        :type cluster: loaf.cluster.LOAFCluster
         :return:
         :rtype: pq.second
         """
