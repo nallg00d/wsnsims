@@ -9,6 +9,7 @@ wireless sensor networks (WSNs). At present, the implemented algorithms are,
 * TOCS
 * FOCUS
 * MINDS
+* LOAF
 
 Setup
 =====
