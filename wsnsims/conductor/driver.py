@@ -87,11 +87,7 @@ def run_loaf(parameters):
     env.isdvsd = parameters.isdvsd
     env.comms_range = parameters.radio_range
 
-    flower_sim = LOAF(env)
-    print(
-        "Starting LOAF at {}".format(datetime.datetime.now().isoformat()))
-    print("Using {}".format(parameters))
-    start = time.time()
+    loaf_sim = LOAF(env)
     runner = loaf_sim.run()
 
     results = Results(runner.maximum_communication_delay(),
