@@ -8,11 +8,11 @@ import scipy.sparse.csgraph as sp
 logger = logging.getLogger(__name__)
 
 
-class FLOWERMovementError(Exception):
+class LOAFMovementError(Exception):
     pass
 
 
-class FLOWERMovementModel(object):
+class LOAFMovementModel(object):
     def __init__(self, simulation_data, environment):
         self.sim = simulation_data
         self.env = environment
@@ -95,9 +95,9 @@ class FLOWERMovementModel(object):
         Get the shortest distance between any two segments.
 
         :param begin:
-        :type begin: flower.cell.Cell
+        :type begin: loaf.cell.Cell
         :param end:
-        :type end: flower.cell.Cell
+        :type end: loaf.cell.Cell
         :return: float, list(int)
         """
 

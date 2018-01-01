@@ -2,19 +2,19 @@ import itertools
 
 import numpy as np
 
-from wsnsims.flower.data import cell_volume
+from wsnsims.loaf.data import cell_volume
 
 
-class FLOWEREnergyModelError(Exception):
+class LOAFEnergyModelError(Exception):
     pass
 
 
-class FLOWEREnergyModel(object):
+class LOAFEnergyModel(object):
     def __init__(self, simulation_data, environment):
         """
 
         :param simulation_data:
-        :type simulation_data: flower.flower_sim.FlowerSim
+        :type simulation_data: loaf.loaf_sim.LoafSim
         :param environment:
         :type environment: core.environment.Environment
         """
@@ -26,7 +26,7 @@ class FLOWEREnergyModel(object):
         """
 
         :param cluster:
-        :type cluster: flower.cluster.FLOWERCluster
+        :type cluster: loaf.cluster.LOAFCluster
         :return:
         :rtype: pq.bit
         """
@@ -56,9 +56,9 @@ class FLOWEREnergyModel(object):
         """
 
         :param cluster:
-        :type cluster: flower.cluster.FLOWERCluster
+        :type cluster: loaf.cluster.LOAFCluster
         :return:
-        :type: list(flower.cluster.FLOWERCluster)
+        :type: list(loaf.cluster.LOAFCluster)
         """
 
         neighbors = list()
@@ -72,7 +72,7 @@ class FLOWEREnergyModel(object):
         """
 
         :param hub:
-        :type hub: flower.cluster.FLOWERHubCluster
+        :type hub: loaf.cluster.LOAFHubCluster
         :return:
         :rtype: pq.bit
         """
@@ -144,7 +144,7 @@ class FLOWEREnergyModel(object):
 
         :param cluster_id:
         :return:
-        :rtype: flower.cluster.FlowerCluster
+        :rtype: loaf.cluster.LoafCluster
         """
 
         all_clusters = self.sim.clusters + [self.sim.hub]
@@ -156,7 +156,7 @@ class FLOWEREnergyModel(object):
                 break
 
         if not found_cluster:
-            raise FLOWEREnergyModelError(
+            raise LOAFEnergyModelError(
                 "Could not find cluster {}".format(cluster_id))
 
         return found_cluster
@@ -166,7 +166,7 @@ class FLOWEREnergyModel(object):
         Return the amount of energy required to complete a single tour of the
         specified cluster.
 
-        :param cluster: An instance of a FLOWER cluster.
+        :param cluster: An instance of a LOAF cluster.
 
         :return: The amount of energy required.
         :rtype: pq.J
