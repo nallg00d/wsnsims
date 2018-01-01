@@ -5,21 +5,21 @@ from wsnsims.core.cluster import BaseCluster
 logger = logging.getLogger(__name__)
 
 
-class FlowerCluster(BaseCluster):
+class LoafCluster(BaseCluster):
     def __init__(self, environment):
         """
 
         :param environment:
         :type environment: core.environment.Environment
         """
-        super(FlowerCluster, self).__init__(environment)
+        super(LoafCluster, self).__init__(environment)
 
         self.completed = False
         self.recent = None
 
     @property
     def cluster_id(self):
-        return super(FlowerCluster, self).cluster_id
+        return super(LoafCluster, self).cluster_id
 
     @cluster_id.setter
     def cluster_id(self, value):
@@ -56,48 +56,48 @@ class FlowerCluster(BaseCluster):
         """
 
         :param cell:
-        :type cell: flower.cell.Cell
+        :type cell: loaf.cell.Cell
         :return:
         """
-        super(FlowerCluster, self).add(cell)
+        super(LoafCluster, self).add(cell)
         self.recent = cell
 
     def remove(self, cell):
         """
 
         :param cell:
-        :type cell: flower.cell.Cell
+        :type cell: loaf.cell.Cell
         :return:
         """
-        super(FlowerCluster, self).remove(cell)
+        super(LoafCluster, self).remove(cell)
         if cell == self.recent:
             self.recent = None
 
     def __str__(self):
-        return "Flower Cluster {}".format(self.cluster_id)
+        return "Loaf Cluster {}".format(self.cluster_id)
 
     def __repr__(self):
         return "FC{}".format(self.cluster_id)
 
 
-class FlowerVirtualCluster(FlowerCluster):
+class LoafVirtualCluster(LoafCluster):
     def __init__(self, environment):
         """
 
         :param environment:
         :type environment: core.environment.Environment
         """
-        super(FlowerVirtualCluster, self).__init__(environment)
+        super(LoafVirtualCluster, self).__init__(environment)
 
     def __str__(self):
-        return "Flower Virtual Cluster {}".format(self.cluster_id)
+        return "Loaf Virtual Cluster {}".format(self.cluster_id)
 
     def __repr__(self):
         return "FVC{}".format(self.cluster_id)
 
     @property
     def cluster_id(self):
-        return super(FlowerVirtualCluster, self).cluster_id
+        return super(LoafVirtualCluster, self).cluster_id
 
     @cluster_id.setter
     def cluster_id(self, value):
@@ -106,33 +106,33 @@ class FlowerVirtualCluster(FlowerCluster):
             cell.virtual_cluster_id = self.cluster_id
 
 
-class FlowerHub(FlowerCluster):
+class LoafHub(LoafCluster):
     def __init__(self, environment):
         """
 
         :param environment:
         :type environment: core.environment.Environment
         """
-        super(FlowerHub, self).__init__(environment)
+        super(LoafHub, self).__init__(environment)
 
     def __str__(self):
-        return "Flower Hub Cluster"
+        return "Loaf Hub Cluster"
 
     def __repr__(self):
         return "FH"
 
 
-class FlowerVirtualHub(FlowerVirtualCluster):
+class LoafVirtualHub(LoafVirtualCluster):
     def __init__(self, environment):
         """
 
         :param environment:
         :type environment: core.environment.Environment
         """
-        super(FlowerVirtualHub, self).__init__(environment)
+        super(LoafVirtualHub, self).__init__(environment)
 
     def __str__(self):
-        return "Flower Virtual Hub Cluster"
+        return "Loaf Virtual Hub Cluster"
 
     def __repr__(self):
         return "FVH"
