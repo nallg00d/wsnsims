@@ -306,21 +306,26 @@ def main():
     tocs_filepath = os.path.join(results_dir, 'tocs.csv')
     minds_filepath = os.path.join(results_dir, 'minds.csv')
     focus_filepath = os.path.join(results_dir, 'focus.csv')
+    loaf_filepath = os.path.join(results_dir, 'loaf.csv')
+    
 
     flower_exists = os.path.isfile(flower_filepath)
     tocs_exists = os.path.isfile(tocs_filepath)
     minds_exists = os.path.isfile(minds_filepath)
     focus_exists = os.path.isfile(focus_filepath)
+    loaf_exists = os.path.isfile(loaf_filepath)
 
     with open(tocs_filepath, 'w', newline='') as tocs_csv, \
             open(flower_filepath, 'w', newline='') as flower_csv, \
             open(minds_filepath, 'w', newline='') as minds_csv, \
-            open(focus_filepath, 'w', newline='') as focus_csv:
+            open(focus_filepath, 'w', newline='') as focus_csv \
+            open(loaf_filepath. 'w'. newline='') as loaf_csv:
 
         tocs_writer = csv.DictWriter(tocs_csv, fieldnames=headers)
         flower_writer = csv.DictWriter(flower_csv, fieldnames=headers)
         minds_writer = csv.DictWriter(minds_csv, fieldnames=headers)
         focus_writer = csv.DictWriter(focus_csv, fieldnames=headers)
+        loaf_writer = csv.DictWriter(loaf_csv, fieldnames=headers)
 
         if not flower_exists:
             flower_writer.writeheader()
@@ -330,9 +335,11 @@ def main():
             minds_writer.writeheader()
         if not focus_exists:
             focus_writer.writeheader()
+        if not loaf_exists:
+            loaf_writer.writeheader()
 
         for parameter in parameters:
-            tocs_res, flower_res, minds_res, focus_res = run(parameter)
+            tocs_res, flower_res, minds_res, focus_res, loaf_res = run(parameter)
 
             for res in tocs_res:
                 # noinspection PyProtectedMember,PyProtectedMember
@@ -357,6 +364,11 @@ def main():
                 focus_writer.writerow(
                     {**res._asdict(), **parameter._asdict()})
                 focus_csv.flush()
+
+            for res in loaf_res:
+                loaf_writer.writerow(
+                    {**res.asdict(), **parameter._asdict()})
+                loaf_csv.flush()
 
     finish = time.time()
     delta = finish - start
