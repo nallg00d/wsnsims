@@ -88,8 +88,13 @@ def run_loaf(parameters):
     env.comms_range = parameters.radio_range
 
     loaf_sim = LOAF(env)
-    runner = loaf_sim.run()
 
+    print(
+        "Starting LOAF at {}".format(datetime.datetime.now().isoformat()))
+    print("Using {}".format(parameters))
+    start = time.time()
+    runner = loaf_sim.run()
+    
     results = Results(runner.maximum_communication_delay(),
                       runner.energy_balance(),
                       0.,
