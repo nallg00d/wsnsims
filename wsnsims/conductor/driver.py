@@ -90,8 +90,8 @@ def run_loaf(parameters):
     loaf_sim = LOAF(env)
 
     print(
-        "Starting LOAF at {}".format(datetime.datetime.now().isoformat())
-    print("Using {}".format(parameters)))
+        "Starting LOAF at {}".format(datetime.datetime.now().isoformat()))
+    print("Using {}".format(parameters))
     start = time.time()
     runner = loaf_sim.run()
 
