@@ -390,7 +390,7 @@ def main():
 
             for res in loaf_res:
                 loaf_writer.writerow(
-                    {**res.asdict(), **parameter._asdict()})
+                   {**res._asdict(), **parameter._asdict()})
                 loaf_csv.flush()
 
     finish = time.time()
