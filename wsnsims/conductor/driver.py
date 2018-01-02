@@ -319,7 +319,7 @@ def main():
             open(flower_filepath, 'w', newline='') as flower_csv, \
             open(minds_filepath, 'w', newline='') as minds_csv, \
             open(focus_filepath, 'w', newline='') as focus_csv \
-            open(loaf_filepath. 'w'. newline='') as loaf_csv:
+            open(loaf_filepath, 'w', newline='') as loaf_csv:
 
         tocs_writer = csv.DictWriter(tocs_csv, fieldnames=headers)
         flower_writer = csv.DictWriter(flower_csv, fieldnames=headers)
