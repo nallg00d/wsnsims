@@ -201,18 +201,22 @@ def run(parameters):
     flower_results = []
     minds_results = []
     focus_results = []
+    loaf_result = []
+    
 
     with multiprocessing.Pool() as pool:
 
         while len(tocs_results) < RUNS or \
                         len(flower_results) < RUNS or \
                         len(minds_results) < RUNS or \
-                        len(focus_results) < RUNS:
+                        len(focus_results) < RUNS or \
+                        len(loaf_results) < RUNS:
 
             tocs_workers = []
             flower_workers = []
             minds_workers = []
             focus_workers = []
+            loaf_workers = []
 
             if len(tocs_results) < RUNS:
                 tocs_workers = [
@@ -233,6 +237,11 @@ def run(parameters):
                 focus_workers = [
                     pool.apply_async(run_focus, (parameters,))
                     for _ in range(RUNS - len(focus_results))]
+
+            if len(loaf_results) < RUNS:
+                loaf_workers = [
+                    pool.apply_async(run_loaf, (parameters,))
+                    for _ in range(RUNS - len(loaf_results))]
 
             for result in tocs_workers:
                 try:
@@ -262,6 +271,14 @@ def run(parameters):
                     logger.exception('FOCUS Exception')
                     continue
 
+            for result in loaf_workers:
+                try:
+                    loaf_results.append(result.get(timeout=WAIT_TIME))
+                except Exception:
+                    logger.exception('LOAF Exception')
+                    continue
+                    
+
     # mean_tocs_results = average_results(tocs_results[:RUNS])
     # mean_flower_results = average_results(flower_results[:RUNS])
     # mean_minds_results = average_results(minds_results[:RUNS])
@@ -271,9 +288,10 @@ def run(parameters):
     mean_flower_results = flower_results[:RUNS]
     mean_minds_results = minds_results[:RUNS]
     mean_focus_results = focus_results[:RUNS]
+    mean_loaf_results = loaf_results[:RUNS]
 
     return (mean_tocs_results, mean_flower_results, mean_minds_results,
-            mean_focus_results)
+            mean_focus_results, loaf_results)
 
 
 def get_argparser():
