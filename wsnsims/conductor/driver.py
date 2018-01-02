@@ -88,13 +88,8 @@ def run_loaf(parameters):
     env.comms_range = parameters.radio_range
 
     loaf_sim = LOAF(env)
-
-    print(
-        "Starting LOAF at {}".format(datetime.datetime.now().isoformat()))
-    print("Using {}".format(parameters))
-    start = time.time()
     runner = loaf_sim.run()
-    
+
     results = Results(runner.maximum_communication_delay(),
                       runner.energy_balance(),
                       0.,
@@ -341,7 +336,7 @@ def main():
     with open(tocs_filepath, 'w', newline='') as tocs_csv, \
             open(flower_filepath, 'w', newline='') as flower_csv, \
             open(minds_filepath, 'w', newline='') as minds_csv, \
-            open(focus_filepath, 'w', newline='') as focus_csv \
+            open(focus_filepath, 'w', newline='') as focus_csv, \
             open(loaf_filepath, 'w', newline='') as loaf_csv:
 
         tocs_writer = csv.DictWriter(tocs_csv, fieldnames=headers)
