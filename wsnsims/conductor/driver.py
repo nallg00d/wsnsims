@@ -201,7 +201,7 @@ def run(parameters):
     flower_results = []
     minds_results = []
     focus_results = []
-    loaf_result = []
+    loaf_results = []
     
 
     with multiprocessing.Pool() as pool:

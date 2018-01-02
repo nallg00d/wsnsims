@@ -10,4 +10,4 @@ class LoafSegment(Segment):
         return "LOAF Segment {}".format(self.segment_id)
 
     def __repr__(self):
-        return "FSEG {}".format(self.segment_id)
+        return "LSEG {}".format(self.segment_id)
