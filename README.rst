@@ -29,6 +29,9 @@ will be placed in a local directory called ``results`` by default. From within
 the ``wsnsims`` directory, execute the following.::
 
     $ python -m wsnsims.conductor.driver
+    
+    # LOAF only
+    $ python -m wsnsims.conductor.loafdriver
 
 For options, pass in the ``--help`` option::
 
