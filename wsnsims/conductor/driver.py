@@ -303,19 +303,13 @@ def run(parameters):
 def get_argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--outdir', '-o', type=os.path.realpath, default='results')
-    parser.add_argument('--loaf', help="LOAF Simulation Only", action="store_true", default=False)
-    parser.add_argument('--tocs',help="ToCS Simulation Only",action="store_true", default=False)
-    parser.add_argument('--minds',help="MINDS Simulation Only",action="store_true",default=False)
-    parser.add_argument('--flower',help="FLOWER Simulation Only",action="store_true",default=False)
-    parser.add_argument('--focus',help="FOCUS Simulation Only",action="store_true",default=False)
+
     return parser
 
 
 def main():
     parser = get_argparser()
     args = parser.parse_args()
-
-    # Code to proces one arguement at at ime
 
     start = time.time()
     seed = int(time.time())
