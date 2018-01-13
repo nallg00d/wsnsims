@@ -297,7 +297,7 @@ def run(parameters):
     mean_loaf_results = loaf_results[:RUNS]
 
     return (mean_tocs_results, mean_flower_results, mean_minds_results,
-            mean_focus_results, loaf_results)
+            mean_focus_results, mean_loaf_results)
 
 
 def get_argparser():
