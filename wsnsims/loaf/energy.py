@@ -52,6 +52,31 @@ class LOAFEnergyModel(object):
         total_volume = internal_volume + external_volume
         return total_volume
 
+    def initEG(self, cluster):
+        """
+        :param cluster - clusters of segments
+        :type - loaf.cluster
+        :return xxx
+        """
+
+        # Loop through Clusters
+
+        for clust in clusters:
+            for seg in cluster.segments:
+                pass
+        return true
+    
+    def findEG(self, segments):
+        """
+        :param cluster: clusters of segments
+        :type cluster: loaf.cluster.LOAFCluster
+        :return eG - eG for set of segments
+        :type float
+        """
+        
+
+        return eG
+    
     def neighbor_clusters(self, cluster):
         """
 

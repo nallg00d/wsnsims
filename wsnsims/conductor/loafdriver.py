@@ -37,9 +37,6 @@ def average_results(results):
                      mean_buffer)
     return result
 
-
-
-
 def run_loaf(parameters):
     """
 
@@ -75,15 +72,10 @@ def run_loaf(parameters):
 def run(parameters):
 
     loaf_results = []
-    
 
     with multiprocessing.Pool() as pool:
 
-        while len(tocs_results) < RUNS or \
-                        len(flower_results) < RUNS or \
-                        len(minds_results) < RUNS or \
-                        len(focus_results) < RUNS or \
-                        len(loaf_results) < RUNS:
+        while len(loaf_results) < RUNS:
 
             loaf_workers = []
 
@@ -134,8 +126,7 @@ def main():
     
     loaf_exists = os.path.isfile(loaf_filepath)
 
-    with open(tocs_filepath, 'w', newline='') as tocs_csv, \
-            open(loaf_filepath, 'w', newline='') as loaf_csv:
+    with open(loaf_filepath, 'w', newline='') as loaf_csv:
 
         loaf_writer = csv.DictWriter(loaf_csv, fieldnames=headers)
         
