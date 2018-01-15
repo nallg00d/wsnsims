@@ -258,16 +258,27 @@ for seg in segmentList:
 # starting out, center cluster is at eG
 eG = findEG(nodeList)
 
-center_cluster = eG
+center_cluster_coord = eG
 
 # initialize clusters, each segment is in it's own cluster
 
 start_clusters =  initClusters(segmentList)
 
 #find real central cluster by using euclid distance
+
+centralCluster = list()
+
 for seg in segmentList:
     for node in seg:
-        print(findEucDist(node, eG))
+        if findEucDist(node, eG) <= 30:
+            centralCluster.append(seg)
+            # we add this segment to the cluster
+            break
+
+for seg in centralCluster:
+    print(seg)
+            
+            
     
 
 # remove central cluster form non-essential cluster list
