@@ -2,74 +2,93 @@ import os
 import sys
 import math
 
-# List to hold all the segments
-mainSegments = list()
 
 #x coord, y coord, mbit speed
-node1 = [0,4,1]
-node2 = [5,0,1]
-#
-node3 = [14,0,2]
-node4 = [5,6,21]
-#
-node5 = [11,4,7]
-node6 = [17,4,1]
-#
-node7 = [2,9,29]
-node8 = [8,9,50]
-#
-node9 = [12,9,17]
-node10 = [17,9,13]
-#
-node11 = [4,12,31]
-node12 = [9,13,34]
+S0 = [9,13,34]
+S1 = [4,12,31]
+S2 = [2,9,29]
+S3 = [7,9,50]
+S4 = [12,9,17]
+S5 = [17,9,13]
+S6 = [17,4,1]
+S7 = [14,0,2]
+S8 = [11,4,7]
+S9 = [5,0,1]
+S10 = [5,6,22]
+S11 = [0,4,1]
 
-segment = list()
-seg1 = list()
-seg2 = list()
-seg3 = list()
-seg4 = list()
-seg5 = list()
-seg6 = list()
+seg10_11 = list()
+seg10_8 = list()
+seg9_8 = list()
+seg7_8 = list()
+seg8_4 = list()
+seg8_5 = list()
+seg6_5 = list()
+seg0_5 = list()
+seg0_3 = list()
+seg3_4 = list()
+seg3_2 = list()
+seg1_2 = list()
+seg1_10 = list()
 
-seg1.append(node1)
-seg1.append(node2)
+seg10_11.append(S10)
+seg10_11.append(S11)
 
-seg2.append(node3)
-seg2.append(node4)
+seg10_8.append(S10)
+seg10_8.append(S8)
 
-seg3.append(node5)
-seg3.append(node6)
+seg9_8.append(S9)
+seg9_8.append(S8)
 
-seg4.append(node7)
-seg4.append(node8)
+seg7_8.append(S7)
+seg7_8.append(S8)
 
-seg5.append(node9)
-seg5.append(node10)
+seg8_4.append(S4)
+seg8_4.append(S8)
 
-seg6.append(node11)
-seg6.append(node12)
+seg8_5.append(S8)
+seg8_5.append(S5)
+
+seg6_5.append(S6)
+seg6_5.append(S5)
+
+seg0_5.append(S0)
+seg0_5.append(S5)
+
+seg0_3.append(S0)
+seg0_3.append(S3)
+
+seg3_4.append(S3)
+seg3_4.append(S4)
+
+seg3_2.append(S3)
+seg3_2.append(S2)
+
+seg1_2.append(S1)
+seg1_2.append(S2)
+
+seg1_10.append(S1)
+seg1_10.append(S10)
+
+
+segmentList = list()
 
 # Now add all segmetns to main segment list
-mainSegments.append(seg1)
-mainSegments.append(seg2)
-mainSegments.append(seg3)
-mainSegments.append(seg4)
-mainSegments.append(seg5)
-mainSegments.append(seg6)
+segmentList.append(seg10_8)
+segmentList.append(seg10_11)
+segmentList.append(seg9_8)
+segmentList.append(seg7_8)
+segmentList.append(seg8_4)
+segmentList.append(seg8_5)
+segmentList.append(seg6_5)
+segmentList.append(seg0_5)
+segmentList.append(seg0_3)
+segmentList.append(seg3_4)
+segmentList.append(seg3_2)
+segmentList.append(seg1_2)
+segmentList.append(seg1_10)
 
-segment.append(node1)
-segment.append(node2)
-segment.append(node3)
-segment.append(node4)
-segment.append(node5)
-segment.append(node6)
-segment.append(node7)
-segment.append(node8)
-segment.append(node9)
-segment.append(node10)
-segment.append(node11)
-segment.append(node12)
+
 
 radio1  = 100
 radio2 = 50
@@ -77,52 +96,67 @@ radio3 = 25
 radio4 = 30
 
 mdc_count = 12
-seg_count = len(segment)
+seg_count = len(segmentList)
 
 # Find EG coordinates of the segment
 # Center of mass for segments
-def findEG(segments):
-
+def findEG(nodeList):
     eGs = list()
     totalData = 0
     yweight = 0
     xweight = 0
-    
-    for seg in segments:
-        x = seg[0]
-        y = seg[1]
-        data = seg[2]
-        
+
+    # Segment has 2 nodes, so get data from each node
+    for node in nodeList:
+        x = node[0]
+        y = node[1]
+        data = node[2]
+
         xweight += x * data
         yweight += y * data
         totalData += data
-        
-    Cx = xweight / totalData
-    Cy = yweight / totalData
-     
+
+    # rounding the data to no decimal points here for simplicity
+    Cx = round(xweight / totalData)
+    Cy = round(yweight / totalData)
+
     eGs.append(Cx)
     eGs.append(Cy)
-    
+
+    # coordinates for center of energy 
     return eGs
 
-## Need to find non-central clusters
-## First though, we need to organize clusters in the first place
-def findEucDist(segment, eG):
-    x = segment[0]
-    y = segment[1]
+# Finds the euclidian distance between a node and eG
+def findEucDist(node, eG):
 
-    # eg is a list, get each one individual
+    x = node[0]
+    y = node[1]
+    
     eG_x = eG[0]
     eG_y = eG[1]
 
-    #We now have 2 vectors we can do the math on and get the distance
+    
     temp1 = (x - eG_x) ** 2
     temp2 = (y - eG_y) ** 2
 
-    distance = math.sqrt(temp1 + temp2)
+    distance = round(math.sqrt(temp1 + temp2))
+            
     
     return distance
 
+# initialize and form segments into clusters
+def initClusters(segments):
+
+    start_clusters = list()
+    # Loop through segments 
+
+    for seg in segments:
+        start_clusters.append(seg)
+        
+    return start_clusters
+
+
+# Find the non-essential clusters
 def findNonEssentialClusters(segments):
 
     clusters = list()
@@ -207,3 +241,37 @@ def findCentralCluster(clusters):
 
 
 #print(findEG(segment))
+
+
+
+
+# main code here
+
+# loop through list of main segments
+# get nodes from segments
+nodeList = list()
+
+for seg in segmentList:
+    for node in seg:
+        nodeList.append(node)
+
+# starting out, center cluster is at eG
+eG = findEG(nodeList)
+
+center_cluster = eG
+
+# initialize clusters, each segment is in it's own cluster
+
+start_clusters =  initClusters(segmentList)
+
+#find real central cluster by using euclid distance
+for seg in segmentList:
+    for node in seg:
+        print(findEucDist(node, eG))
+    
+
+# remove central cluster form non-essential cluster list
+
+
+          
+        
