@@ -17,6 +17,22 @@ S9 = [5,0,1]
 S10 = [5,6,22]
 S11 = [0,4,1]
 
+nodes = list()
+nodes.append(S0)
+nodes.append(S1)
+nodes.append(S2)
+nodes.append(S3)
+nodes.append(S4)
+nodes.append(S5)
+nodes.append(S6)
+nodes.append(S7)
+nodes.append(S8)
+nodes.append(S9)
+nodes.append(S10)
+nodes.append(S11)
+
+
+
 seg10_11 = list()
 seg10_8 = list()
 seg9_8 = list()
@@ -247,41 +263,82 @@ def findCentralCluster(clusters):
 
 # main code here
 
-# loop through list of main segments
-# get nodes from segments
-nodeList = list()
-
-for seg in segmentList:
-    for node in seg:
-        nodeList.append(node)
-
 # starting out, center cluster is at eG
-eG = findEG(nodeList)
+eG = findEG(nodes)
 
 center_cluster_coord = eG
 
 # initialize clusters, each segment is in it's own cluster
 
-start_clusters =  initClusters(segmentList)
+startClusters = initClusters(nodes)
 
-#find real central cluster by using euclid distance
+# Central cluster starts at eG, which is eG
 
 centralCluster = list()
+centralCluster.append(S3)
 
-for seg in segmentList:
-    for node in seg:
-        if findEucDist(node, eG) <= 30:
-            centralCluster.append(seg)
-            # we add this segment to the cluster
-            break
+# Remove from our node list
+nodes.remove(S3)
 
-for seg in centralCluster:
-    print(seg)
-            
-            
+nonEssClust = list()
+
+# Add each node to it's own cluster
+# add cluster to list of non-essential clusters
+for node in nodes:
+    cluster = list()
+    cluster.append(node)
+    nonEssClust.append(cluster)
+
+# Now we need to merge clusters
+
+toMerge = list()
+total = 0
+prev = 0
+round = 0
+
+# Clusters -> cluster -> node
+# list -> List -> list
+
+mergedClust = list()
+# Loop through nodes
+# determine which two will be grouped into a cluster
+for outer in nodes:
+    for inner in nodes:
+        if inner == outer:
+            continue
+        else:
+            outerWeight = outer[2]
+            innerWeight = inner[2]
+
+            if round == 0:
+                round += 1
+                prev = outerWeight + innerWeight
+                continue
+            else:
+                total = outerWeight + innerWeight
+                if total < prev:
+                    toMerge.clear()
+                    prev = total
+                    print("Prev: ", prev, "Total: ", total)
+                    toMerge.append(outer)
+                    toMerge.append(inner)
+
+                    cluster = list()
+                    for m in toMerge:
+                        cluster.append(m)
+                        nodes.remove(m)
+                        mergedClust.append(cluster)
+                    round += 1
     
+            # We now have a list of clusters to merge, we we assign them to a new cluster
+                    
 
-# remove central cluster form non-essential cluster list
+                        
+            
+        
+        
+        
+
 
 
           
