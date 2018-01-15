@@ -257,7 +257,15 @@ def findCentralCluster(clusters):
 
 
 #print(findEG(segment))
+def mergeClusters(nodes):
 
+    return true
+
+
+def hamilCycle(nodes):
+
+
+    return true
 
 
 
@@ -299,9 +307,12 @@ round = 0
 # Clusters -> cluster -> node
 # list -> List -> list
 
-mergedClust = list()
+newClusters = list()
+cluster = list()
 # Loop through nodes
 # determine which two will be grouped into a cluster
+
+
 for outer in nodes:
     for inner in nodes:
         if inner == outer:
@@ -319,21 +330,169 @@ for outer in nodes:
                 if total < prev:
                     toMerge.clear()
                     prev = total
-                    print("Prev: ", prev, "Total: ", total)
+                #    print("Prev: ", prev, "Total: ", total)
                     toMerge.append(outer)
                     toMerge.append(inner)
 
-                    cluster = list()
-                    for m in toMerge:
-                        cluster.append(m)
-                        nodes.remove(m)
-                        mergedClust.append(cluster)
-                    round += 1
-    
-            # We now have a list of clusters to merge, we we assign them to a new cluster
-                    
+                # Now we add them to a new cluster
+                # We then need to remove from nodes
 
-                        
+clust1 = list()
+for m in toMerge:
+    clust1.append(m)
+    nodes.remove(m)
+
+# Now we repeat the process
+total = 0
+prev = 0
+round = 0
+
+for outer in nodes:
+    for inner in nodes:
+        if inner == outer:
+            continue
+        else:
+            outerWeight = outer[2]
+            innerWeight = inner[2]
+
+            if round == 0:
+                round += 1
+                prev = outerWeight + innerWeight
+                continue
+            else:
+                total = outerWeight + innerWeight
+                if total < prev:
+                    toMerge.clear()
+                    prev = total
+                #    print("Prev: ", prev, "Total: ", total)
+                    toMerge.append(outer)
+                    toMerge.append(inner)
+
+                # Now we add them to a new cluster
+                # We then need to remove from nodes
+
+clust2 = list()
+for m in toMerge:
+    clust2.append(m)
+    nodes.remove(m)
+
+total = 0
+prev = 0
+round = 0
+
+for outer in nodes:
+    for inner in nodes:
+        if inner == outer:
+            continue
+        else:
+            outerWeight = outer[2]
+            innerWeight = inner[2]
+
+            if round == 0:
+                round += 1
+                prev = outerWeight + innerWeight
+                continue
+            else:
+                total = outerWeight + innerWeight
+                if total < prev:
+                    toMerge.clear()
+                    prev = total
+                #    print("Prev: ", prev, "Total: ", total)
+                    toMerge.append(outer)
+                    toMerge.append(inner)
+
+                # Now we add them to a new cluster
+                # We then need to remove from nodes
+clust3 = list()
+for m in toMerge:
+    clust3.append(m)
+    nodes.remove(m)
+
+
+total = 0
+prev = 0
+round = 0
+
+for outer in nodes:
+    for inner in nodes:
+        if inner == outer:
+            continue
+        else:
+            outerWeight = outer[2]
+            innerWeight = inner[2]
+
+            if round == 0:
+                round += 1
+                prev = outerWeight + innerWeight
+                continue
+            else:
+                total = outerWeight + innerWeight
+                if total < prev:
+                    toMerge.clear()
+                    prev = total
+                #    print("Prev: ", prev, "Total: ", total)
+                    toMerge.append(outer)
+                    toMerge.append(inner)
+
+                # Now we add them to a new cluster
+                # We then need to remove from nodes
+
+clust4 = list()
+for m in toMerge:
+    clust4.append(m)
+    nodes.remove(m)
+
+
+total = 0
+prev = 0
+round = 0
+
+for outer in nodes:
+    for inner in nodes:
+        if inner == outer:
+            continue
+        else:
+            outerWeight = outer[2]
+            innerWeight = inner[2]
+
+            if round == 0:
+                round += 1
+                prev = outerWeight + innerWeight
+                continue
+            else:
+                total = outerWeight + innerWeight
+                if total < prev:
+                    toMerge.clear()
+                    prev = total
+                #    print("Prev: ", prev, "Total: ", total)
+                    toMerge.append(outer)
+                    toMerge.append(inner)
+
+                # Now we add them to a new cluster
+                # We then need to remove from nodes
+
+clust5 = list()
+for m in toMerge:
+    clust5.append(m)
+    nodes.remove(m)
+
+clust6 = list()
+# Only one node left
+if len(nodes) == 1:
+    clust6.append(nodes.pop())
+
+phase1_clusters = list()
+phase1_clusters.append(clust1)
+phase1_clusters.append(clust2)
+phase1_clusters.append(clust3)
+phase1_clusters.append(clust4)
+phase1_clusters.append(clust5)
+phase1_clusters.append(clust6)
+
+for clust in phase1_clusters:
+    print(clust)
+
+
             
         
         
