@@ -285,213 +285,82 @@ startClusters = initClusters(nodes)
 centralCluster = list()
 centralCluster.append(S3)
 
-# Remove from our node list
+# Remove from our node list that is at eG
 nodes.remove(S3)
 
-nonEssClust = list()
+singleClusterList = list()
 
 # Add each node to it's own cluster
-# add cluster to list of non-essential clusters
 for node in nodes:
     cluster = list()
     cluster.append(node)
-    nonEssClust.append(cluster)
+    singleClusterList.append(cluster)
 
-# Now we need to merge clusters
+## Phase 1 results should be
+# MDC Count = 5
+# Cluster 0 = S0, S1
+# Cluster 1 = S2, S9, S10, S11
+# Cluster 2 = S6, S7, S8
+# Cluster 3 = S4, S5
+#
+# Cluster 4 = S3 ## eG
 
-toMerge = list()
-total = 0
-prev = 0
-round = 0
+# k in the paper
+mdcCount = 5
 
-# Clusters -> cluster -> node
-# list -> List -> list
+#k - 1 in the paper
+numClusters = mdcCount -1
 
-newClusters = list()
-cluster = list()
-# Loop through nodes
-# determine which two will be grouped into a cluster
+k = numClusters
 
+listOfClusters = list()
+cenClust = list()
+cenClust.append(S3)
 
-for outer in nodes:
-    for inner in nodes:
-        if inner == outer:
-            continue
-        else:
-            outerWeight = outer[2]
-            innerWeight = inner[2]
+# Simulating a do/while loop
+while True:
+    cluster = list()
 
-            if round == 0:
-                round += 1
-                prev = outerWeight + innerWeight
+    round = 0
+    prev = 0
+    total = 0
+    toMerge = list()
+    for outer in nodes:
+        for inner in nodes:
+            # Skip if it's own cluster
+            if inner == outer:
                 continue
             else:
-                total = outerWeight + innerWeight
-                if total < prev:
-                    toMerge.clear()
-                    prev = total
-                #    print("Prev: ", prev, "Total: ", total)
-                    toMerge.append(outer)
-                    toMerge.append(inner)
+                outerMetric = outer[2]
+                innerMetric = inner[2]
 
-                # Now we add them to a new cluster
-                # We then need to remove from nodes
+                if round == 0:
+                    prev = outerMetric + innerMetric
+                else:
+                    total = outerMetric + innerMetric
 
-clust1 = list()
-for m in toMerge:
-    clust1.append(m)
-    nodes.remove(m)
+                    if total < prev:
+                        toMerge.append(outer)
+                        toMerge.append(inner)
+                        nodes.remove(inner)
 
-# Now we repeat the process
-total = 0
-prev = 0
-round = 0
-
-for outer in nodes:
-    for inner in nodes:
-        if inner == outer:
-            continue
-        else:
-            outerWeight = outer[2]
-            innerWeight = inner[2]
-
-            if round == 0:
+                # next round of processing
                 round += 1
-                prev = outerWeight + innerWeight
-                continue
-            else:
-                total = outerWeight + innerWeight
-                if total < prev:
-                    toMerge.clear()
-                    prev = total
-                #    print("Prev: ", prev, "Total: ", total)
-                    toMerge.append(outer)
-                    toMerge.append(inner)
+                for m in toMerge:
+                    cluster.append(m)
 
-                # Now we add them to a new cluster
-                # We then need to remove from nodes
+    listOfClusters.append(cluster)
+    cluster.clear()
+    toMerge.clear()
+        
+    k = k-1
+    if k == 0:
+        break
+    
+# Just to make sure center cluster is last in list
+listOfClusters.append(cenClust)
 
-clust2 = list()
-for m in toMerge:
-    clust2.append(m)
-    nodes.remove(m)
-
-total = 0
-prev = 0
-round = 0
-
-for outer in nodes:
-    for inner in nodes:
-        if inner == outer:
-            continue
-        else:
-            outerWeight = outer[2]
-            innerWeight = inner[2]
-
-            if round == 0:
-                round += 1
-                prev = outerWeight + innerWeight
-                continue
-            else:
-                total = outerWeight + innerWeight
-                if total < prev:
-                    toMerge.clear()
-                    prev = total
-                #    print("Prev: ", prev, "Total: ", total)
-                    toMerge.append(outer)
-                    toMerge.append(inner)
-
-                # Now we add them to a new cluster
-                # We then need to remove from nodes
-clust3 = list()
-for m in toMerge:
-    clust3.append(m)
-    nodes.remove(m)
-
-
-total = 0
-prev = 0
-round = 0
-
-for outer in nodes:
-    for inner in nodes:
-        if inner == outer:
-            continue
-        else:
-            outerWeight = outer[2]
-            innerWeight = inner[2]
-
-            if round == 0:
-                round += 1
-                prev = outerWeight + innerWeight
-                continue
-            else:
-                total = outerWeight + innerWeight
-                if total < prev:
-                    toMerge.clear()
-                    prev = total
-                #    print("Prev: ", prev, "Total: ", total)
-                    toMerge.append(outer)
-                    toMerge.append(inner)
-
-                # Now we add them to a new cluster
-                # We then need to remove from nodes
-
-clust4 = list()
-for m in toMerge:
-    clust4.append(m)
-    nodes.remove(m)
-
-
-total = 0
-prev = 0
-round = 0
-
-for outer in nodes:
-    for inner in nodes:
-        if inner == outer:
-            continue
-        else:
-            outerWeight = outer[2]
-            innerWeight = inner[2]
-
-            if round == 0:
-                round += 1
-                prev = outerWeight + innerWeight
-                continue
-            else:
-                total = outerWeight + innerWeight
-                if total < prev:
-                    toMerge.clear()
-                    prev = total
-                #    print("Prev: ", prev, "Total: ", total)
-                    toMerge.append(outer)
-                    toMerge.append(inner)
-
-                # Now we add them to a new cluster
-                # We then need to remove from nodes
-
-clust5 = list()
-for m in toMerge:
-    clust5.append(m)
-    nodes.remove(m)
-
-clust6 = list()
-# Only one node left
-if len(nodes) == 1:
-    clust6.append(nodes.pop())
-
-phase1_clusters = list()
-phase1_clusters.append(clust1)
-phase1_clusters.append(clust2)
-phase1_clusters.append(clust3)
-phase1_clusters.append(clust4)
-phase1_clusters.append(clust5)
-phase1_clusters.append(clust6)
-
-for clust in phase1_clusters:
-    print(clust)
-
+print(listOfClusters)
 
             
         
