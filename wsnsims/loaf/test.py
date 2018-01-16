@@ -317,48 +317,48 @@ listOfClusters = list()
 cenClust = list()
 cenClust.append(S3)
 
+
 # Simulating a do/while loop
 while True:
-    cluster = list()
+
 
     round = 0
     lowest = 0
-    total = 0
-    toMerge = list()
-    for outer in nodes:
-        for inner in nodes:
-            # Skip if it's own cluster
-            if inner == outer:
+    sum = 0
+    mergedCluster = list()
+
+    # brute forcing every combination of clusters
+    for clust_x in singleClusterList:
+        for clust_y in singleClusterList:
+            clust_i_total = 0
+            # avoid comparing same cluster to itself
+            if clust_x == clust_y:
                 continue
-            else:
-                outerMetric = outer[2]
-                innerMetric = inner[2]
+            ## Loop for summation
+            for clust_i in singleClusterList:
 
+                if clust_i == clust_x or clust_i == clust_y:
+                    continue
+                    
+                clust_i_total += clust_i[0][2]
+                
+                # First round, so we don't have a lowest yet
                 if round == 0:
-                    lowest = outerMetric + innerMetric
-                else:
-                    total = outerMetric + innerMetric
-                    if total < lowest:
-                        toMerge.clear()
-                        #print("total: ", total, "Lowest: ", lowest)
-                        # Mark both nodes as the summation being valid
-                        toMerge.append(outer)
-                        toMerge.append(inner)
+                    lowest = clust_x[0][2] + clust_y[0][2]
 
-                        #Update the new lowest with total
-                        lowest = total
+                sum = clust_i_total + clust_x[0][2] + clust_y[0][2]
+                if sum < lowest:
+                    mergedCluster.append(clust_x)
+                    mergedCluster.append(clust_y)
+                    # New lowest figured
+                    lowest = sum
+                    
+            round += 1
 
-                # next round of processing
-                round += 1
-    # Out of the node processing
-
-    for m in toMerge:
-        cluster.append(m)
-        if m in nodes:
-            nodes.remove(m)
-
-    listOfClusters.append(cluster)
-
+    # All done merging clusters!
+    listOfClusters.append(mergedCluster)
+    mergedCluster.clear()
+    
     k = k-1
     if k == 0:
         break
@@ -368,6 +368,8 @@ listOfClusters.append(cenClust)
 
 for clust in listOfClusters:
     print(clust)
+
+
     
 
 
