@@ -322,7 +322,7 @@ while True:
     cluster = list()
 
     round = 0
-    prev = 0
+    lowest = 0
     total = 0
     toMerge = list()
     for outer in nodes:
@@ -335,24 +335,30 @@ while True:
                 innerMetric = inner[2]
 
                 if round == 0:
-                    prev = outerMetric + innerMetric
+                    lowest = outerMetric + innerMetric
                 else:
                     total = outerMetric + innerMetric
-
-                    if total < prev:
+                    if total < lowest:
+                        toMerge.clear()
+                        #print("total: ", total, "Lowest: ", lowest)
+                        # Mark both nodes as the summation being valid
                         toMerge.append(outer)
                         toMerge.append(inner)
-                        nodes.remove(inner)
+
+                        #Update the new lowest with total
+                        lowest = total
 
                 # next round of processing
                 round += 1
-                for m in toMerge:
-                    cluster.append(m)
+    # Out of the node processing
+
+    for m in toMerge:
+        cluster.append(m)
+        if m in nodes:
+            nodes.remove(m)
 
     listOfClusters.append(cluster)
-    cluster.clear()
-    toMerge.clear()
-        
+
     k = k-1
     if k == 0:
         break
@@ -360,7 +366,10 @@ while True:
 # Just to make sure center cluster is last in list
 listOfClusters.append(cenClust)
 
-print(listOfClusters)
+for clust in listOfClusters:
+    print(clust)
+    
+
 
             
         
