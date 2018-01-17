@@ -1,6 +1,7 @@
 import os
 import sys
 import math
+from scipy.spatial import distance
 
 
 #x coord, y coord, mbit speed
@@ -142,7 +143,7 @@ def findEG(nodeList):
     # coordinates for center of energy 
     return eGs
 
-# Finds the euclidian distance between a node and eG
+# Finds the euclidian distance between a node and eG for a segment
 def findEucDist(node, eG):
 
     x = node[0]
@@ -160,6 +161,52 @@ def findEucDist(node, eG):
     
     return distance
 
+# Finds tour length for a single node in a segment
+def findTourNode(node, eG):
+
+    # In paper, R is 30meters
+    R = 30
+
+    distance = findEucDist(eG, node)
+
+    tour_length = distance - (2 * R)
+
+    return tour_length
+
+def findTourCluster(cluster, eG):
+
+    distance = 0
+    
+    for node in cluster:
+        distance += findTourNode(node, eG)
+            
+    return distance
+
+
+testList = list()
+testList.append(S0)
+testList.append(S1)
+
+eG = [7,9]
+
+print(findTourCluster(testList,eG))
+
+sys.exit(0)
+
+
+### NEED TO GET Energy of MDC and Add to Node Energy
+### Energy of MDC = lenght of path betwen eG and Node also known as TR(M_i)
+### TR(M_i) == Euclidian distance(eG, node) - 2R
+### R = radio_coverage in meters
+
+def summation(cluster_x, cluster_y, clusterList):
+
+    sum = 0
+    for clust in clusterList:
+        sum += clust[0][2] + cluster_x[0][2] + cluster_y[0][2]
+
+    return sum
+
 # initialize and form segments into clusters
 def initClusters(segments):
 
@@ -172,91 +219,6 @@ def initClusters(segments):
     return start_clusters
 
 
-# Find the non-essential clusters
-def findNonEssentialClusters(segments):
-
-    clusters = list()
-    xEG = list()
-    yEG = list()
-    mainEG = list()
-
-    #findEG returns coordinate list of EG center of mass
-    # Loop through main segments
-    for seg in segments:
-        # each segment has two nodes
-        eG = findEG(seg)
-
-        xEG = eG[0]
-        yEG = eG[1]
-        
-        # Make new cluster with eG and specific segmetn
-        # Cluster0 = Segment between Node 1 and Node 2, eG
-        cluster = list()
-        cluster.append(seg)
-        cluster.append(eG)
-
-        clusters.append(cluster)
-
-        # we're getting eG for seach segment
-
-    tempx = 0
-    for x in xEG:
-        tempx += x
-
-    mainEG.append(tempx)
-
-    tempy = 0
-    for y in yEG:
-        tempy += y
-
-    # List of the mainEG (x,y)
-    mainEG.append(tempy)
-
-    # loop Through cluster list to get temporary central cluster
-
-    # Assuming central cluster will be at eG
-    tempCentralCluster = mainEG
-    
-    for clust in clusters:
-        seg = clust[0]
-        eG = clust[1]
-
-        # assign temporary central cluster
-        # using radio1 as a temporary measure
-        if(findEucDist(seg, mainEG) <= radio1):
-           tempCentralCluster = clust
-
-    # We now need to remove the central cluster frmo the cluster list
-    clusters.remove(tempCentralCluster)
-    
-    mdcE1 = 125
-    mdcE2 = 50
-    mdcE3 = 90
-    mdcE4 = 23
-
-    comE1 = 50
-    comE2 = 22
-    comE3 = 97
-    comE4 = 30
-
-    # We now have a cluster per segment.. we need to group the clusters based on minimum energy
-           
-                
-            #E_c = Communication Energy required
-            # ME = energy required for MDC to serve
-            
-            
-    return true
-
-# Find central cluster based on eG of existing clusters
-def findCentralCluster(clusters):
-
-
-    return true
-        
-
-
-#print(findEG(segment))
 def mergeClusters(nodes):
 
     return true
@@ -317,29 +279,26 @@ listOfClusters = list()
 cenClust = list()
 cenClust.append(S3)
 
-def summation(cluster_x, cluster_y, clusterList):
 
-    sum = 0
-    for clust in clusterList:
-        sum += clust[0][2] + cluster_x[0][2] + cluster_y[0][2]
 
-    return sum
         
-        
+for c in singleClusterList:
+    print(c)
+    
 # Simulating a do/while loop
+lowest = 0
 while True:
-    round = 0
-    lowest = 0
     sum = 0
+    round = 0
     mergedCluster = list()
 
     # brute forcing every combination of clusters
     for clust_x in singleClusterList:
         for clust_y in singleClusterList:
-            clust_i_total = 0
             # avoid comparing same cluster to itself
             if clust_x == clust_y:
                 continue
+            
             ## Loop for summation
             if round == 0:
                 lowest = summation(clust_x, clust_y, singleClusterList)
@@ -348,6 +307,8 @@ while True:
             sum = summation(clust_x, clust_y, singleClusterList)
 
             if sum < lowest:
+                # New pair is found, clear out old list
+                mergedCluster.clear()
                 mergedCluster.append(clust_x)
                 mergedCluster.append(clust_y)
                 lowest = sum
@@ -355,7 +316,6 @@ while True:
         round += 1
 
     listOfClusters.append(mergedCluster)
-    mergedCluster.clear()
 
     k -= 1
     if k == 0:
