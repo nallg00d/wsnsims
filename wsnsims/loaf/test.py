@@ -317,11 +317,17 @@ listOfClusters = list()
 cenClust = list()
 cenClust.append(S3)
 
+def summation(cluster_x, cluster_y, clusterList):
 
+    sum = 0
+    for clust in clusterList:
+        sum += clust[0][2] + cluster_x[0][2] + cluster_y[0][2]
+
+    return sum
+        
+        
 # Simulating a do/while loop
 while True:
-
-
     round = 0
     lowest = 0
     sum = 0
@@ -335,40 +341,32 @@ while True:
             if clust_x == clust_y:
                 continue
             ## Loop for summation
-            for clust_i in singleClusterList:
+            if round == 0:
+                lowest = summation(clust_x, clust_y, singleClusterList)
+                continue
 
-                if clust_i == clust_x or clust_i == clust_y:
-                    continue
-                    
-                clust_i_total += clust_i[0][2]
-                
-                # First round, so we don't have a lowest yet
-                if round == 0:
-                    lowest = clust_x[0][2] + clust_y[0][2]
+            sum = summation(clust_x, clust_y, singleClusterList)
 
-                sum = clust_i_total + clust_x[0][2] + clust_y[0][2]
-                if sum < lowest:
-                    mergedCluster.append(clust_x)
-                    mergedCluster.append(clust_y)
-                    # New lowest figured
-                    lowest = sum
-                    
-            round += 1
+            if sum < lowest:
+                mergedCluster.append(clust_x)
+                mergedCluster.append(clust_y)
+                lowest = sum
 
-    # All done merging clusters!
+        round += 1
+
     listOfClusters.append(mergedCluster)
     mergedCluster.clear()
-    
-    k = k-1
+
+    k -= 1
     if k == 0:
         break
+
     
 # Just to make sure center cluster is last in list
 listOfClusters.append(cenClust)
 
 for clust in listOfClusters:
-    print(clust)
-
+    print("Cluster: ", clust)
 
     
 
