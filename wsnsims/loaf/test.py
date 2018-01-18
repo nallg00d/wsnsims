@@ -134,8 +134,8 @@ def findEG(nodeList):
         totalData += data
 
     # rounding the data to no decimal points here for simplicity
-    Cx = round(xweight / totalData)
-    Cy = round(yweight / totalData)
+    Cx = (xweight / totalData)
+    Cy = (yweight / totalData)
 
     eGs.append(Cx)
     eGs.append(Cy)
@@ -143,9 +143,46 @@ def findEG(nodeList):
     # coordinates for center of energy 
     return eGs
 
-# Finds the euclidian distance between a node and eG for a segment
-def findEucDist(node, eG):
+# Calculates data parameters for energy on a cluster
+def dataCalc(cluster):
 
+    # get Node count
+    nodeCount = len(cluster)
+    sum = 0
+    total = 0
+    # Get total Data for all nodes in cluster
+    for clust in cluster:
+        sum += clust[2]
+
+    for clust in cluster:
+        nodeData = clust[2]
+
+        total += (nodeCount * nodeData) / sum
+    
+    return total
+
+def getMergedData(clust_x, clust_y):
+
+    sum = 0
+    xtotal = 0
+    ytotal = 0
+
+    for x in clust_x:
+        xtotal += x[2]
+
+    for y in clust_y:
+        ytotal += y[2]
+
+    sum = xtotal + ytotal
+    
+    return sum
+
+
+# Finds the euclidian distance between a node and eG for a segment
+# We can use ditance.euclidian(a,b) instead and probaly should as part of scipy
+def findEucDist(eG,node):
+
+    distance = 0
     x = node[0]
     y = node[1]
     
@@ -156,13 +193,17 @@ def findEucDist(node, eG):
     temp1 = (x - eG_x) ** 2
     temp2 = (y - eG_y) ** 2
 
-    distance = round(math.sqrt(temp1 + temp2))
+    sum = temp1 + temp2
+
+    sqrt = math.sqrt(temp1 + temp2)
+
+    distance = sqrt
             
-    
+
     return distance
 
-# Finds tour length for a single node in a segment
-def findTourNode(node, eG):
+# Finds tour length for a single node in a segment to eG
+def findTourNode(eG, node):
 
     # In paper, R is 30meters
     R = 30
@@ -173,38 +214,29 @@ def findTourNode(node, eG):
 
     return tour_length
 
-def findTourCluster(cluster, eG):
+# Gets the entire tour length of a cluster
+def findTourCluster(eG,cluster):
 
     distance = 0
-    
+
+    # Loop through all ndoes in a cluster and sum the tour lengths from each node to eG
     for node in cluster:
-        distance += findTourNode(node, eG)
-            
-    return distance
+        distance += findTourNode(eG,node)
+
+    # Result will be negative, we need to take the absolute value
+    return abs(distance)
 
 
-testList = list()
-testList.append(S0)
-testList.append(S1)
-
-eG = [7,9]
-
-print(findTourCluster(testList,eG))
-
-sys.exit(0)
-
-
-### NEED TO GET Energy of MDC and Add to Node Energy
-### Energy of MDC = lenght of path betwen eG and Node also known as TR(M_i)
-### TR(M_i) == Euclidian distance(eG, node) - 2R
-### R = radio_coverage in meters
-
-def summation(cluster_x, cluster_y, clusterList):
+# Sums the clusters aggregated data of x and Y
+def summation(eG, cluster_x, cluster_y, clusterList):
 
     sum = 0
+    mergedData = 0
     for clust in clusterList:
-        sum += clust[0][2] + cluster_x[0][2] + cluster_y[0][2]
-
+        mergedData = cluster_x[0][2] + cluster_y[0][2]
+                
+        sum += mergedData
+        
     return sum
 
 # initialize and form segments into clusters
@@ -260,13 +292,44 @@ for node in nodes:
 
 ## Phase 1 results should be
 # MDC Count = 5
-# Cluster 0 = S0, S1
-# Cluster 1 = S2, S9, S10, S11
-# Cluster 2 = S6, S7, S8
-# Cluster 3 = S4, S5
+# Cluster 0 = S0, S1  - Tour length: 320
+# Cluster 1 = S2, S9, S10, S11 - Tour Length: 526
+# Cluster 2 = S6, S7, S8 - Tour Length: 470
+# Cluster 3 = S4, S5 - Tour Length: 330
 #
 # Cluster 4 = S3 ## eG
 
+test0 = list()
+test1 = list()
+test2 = list()
+test3 = list()
+
+test0.append(S0)
+test0.append(S1)
+
+test1.append(S2)
+test1.append(S9)
+test1.append(S10)
+test1.append(S11)
+
+test2.append(S6)
+test2.append(S7)
+test2.append(S8)
+
+test3.append(S4)
+test3.append(S5)
+
+print(getMergedData(test0, test1))
+
+## Get tour lengths of clusters
+print(findTourCluster(eG, test0))
+print(findTourCluster(eG, test1))
+print(findTourCluster(eG, test2))
+print(findTourCluster(eG, test3))
+
+
+
+sys.exit(0)
 # k in the paper
 mdcCount = 5
 
@@ -279,17 +342,13 @@ listOfClusters = list()
 cenClust = list()
 cenClust.append(S3)
 
-
-
-        
-for c in singleClusterList:
-    print(c)
     
 # Simulating a do/while loop
 lowest = 0
 while True:
     sum = 0
     round = 0
+    energyCurrCluster = 0
     mergedCluster = list()
 
     # brute forcing every combination of clusters
@@ -301,22 +360,28 @@ while True:
             
             ## Loop for summation
             if round == 0:
-                lowest = summation(clust_x, clust_y, singleClusterList)
+                lowest = summation(eG, clust_x, clust_y, singleClusterList)
                 continue
 
-            sum = summation(clust_x, clust_y, singleClusterList)
+            # Get the energy of the current cluster
+            
+            # This gets the energy summation for a cluster
+            sum = summation(eG, clust_x, clust_y, singleClusterList)
 
+            print("Cluster pair: ", clust_x, clust_y, " sum: ", sum, ", lowest: ", lowest)
+            
             if sum < lowest:
                 # New pair is found, clear out old list
-                mergedCluster.clear()
                 mergedCluster.append(clust_x)
                 mergedCluster.append(clust_y)
                 lowest = sum
-
+        
         round += 1
-
+        
     listOfClusters.append(mergedCluster)
 
+    # We're done marking clusters for merging
+    mergedCluster.clear()
     k -= 1
     if k == 0:
         break
@@ -325,8 +390,8 @@ while True:
 # Just to make sure center cluster is last in list
 listOfClusters.append(cenClust)
 
-for clust in listOfClusters:
-    print("Cluster: ", clust)
+#for clust in listOfClusters:
+ ###   print("Cluster: ", clust)
 
     
 
