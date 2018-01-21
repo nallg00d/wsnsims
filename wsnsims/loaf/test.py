@@ -4,6 +4,7 @@ import math
 import numpy as np
 import scipy.spatial as sp
 from scipy.spatial import distance
+from wsnsims.core import linalg
 
 
 
@@ -146,43 +147,6 @@ def findEG(nodeList):
     # coordinates for center of energy 
     return eGs
 
-# Calculates data parameters for energy on a cluster
-def dataCalc(cluster):
-
-    # get Node count
-    nodeCount = len(cluster)
-    sum = 0
-    total = 0
-    # Get total Data for all nodes in cluster
-    for clust in cluster:
-        sum += clust[2]
-
-    for clust in cluster:
-        nodeData = clust[2]
-
-        total += (nodeCount * nodeData) / sum
-    
-    return total
-
-## Get merged data for cluster X and Y
-## ME(C_x U C_y)
-def getMergedData(clust_x, clust_y):
-
-    sum = 0
-    xtotal = 0
-    ytotal = 0
-
-    for x in clust_x:
-        xtotal += x[2]
-
-    for y in clust_y:
-        ytotal += y[2]
-
-    sum = xtotal + ytotal
-    
-    return sum
-
-
 # Finds the euclidian distance between a node and eG for a segment
 # We can use ditance.euclidian(a,b) instead and probaly should as part of scipy
 def findEucDist(eG,node):
@@ -207,46 +171,123 @@ def findEucDist(eG,node):
 
     return distance
 
+# This will acutally compute a tour between the points of a cluster
+def computeTourCluster(eG, cluster):
 
-# Finds tour length between eG and cluster
-def findTourLength(eG, node):
+    npList = np.array((eG[0], eG[1]))
 
-    npEG = np.array(eG)
-    npNode = np.array(node)
+    new = list()
 
-    R = 30
-    # subtract node from center of mass coordinates
-    cp = npEG - npNode
-    cp /= np.linalg.norm(cp)
-    cp *= R
-    cp += npNode
-        
-    return cp
+    new.append(eG)
 
-# Finds the tour length for an entire cluster
-def findTourLengthCluster(eG, cluster):
-
-    # list of points between eG and the node in the cluster
-    collection_points = list()
-    head = 1
-    tail = 0
-    tourTotal = 0
-
+    # Create list of x and y of each node in cluster, since the node format is [x, y, mbit]
     for node in cluster:
-        collection_points.append(findTourLength(eG, node))
+        x = node[0]
+        y = node[1]
 
-    while head < len(cluster):
-        start = cluster[head]
-        stop = cluster[tail]
-        tourTotal += np.linalg.norm(stop - start)
+        w = list()
+        w.append(x)
+        w.append(y)
+        new.append(w)
+
+    # Should have new list
+    # eG coordinates, node1 in cluster coords, node 2 in coords, ...
+    # radio_range default = 30
+    R = 30
+
+    # Create convex hull object
+    hull = sp.ConvexHull(new, qhull_options='QJ Pp')
+
+    vertices = hull.vertices
+
+    tour = list(vertices)
+
+    # make a np array based on our existing list
+    npNew = np.array(new)
+
+    collection_points = np.empty_like(npNew)
+    center_of_mass = linalg.centroid(npNew[vertices])
+
+    
+    
+    for vertex in vertices:
+        if np.all(np.isclose(center_of_mass, npNew[vertex])):
+            collection_points[vertex] = np.copy(npNew[vertex])
+            continue
+
+        cp = center_of_mass - npNew[vertex]
+        cp /= np.linalg.norm(cp)
+        cp *= R
+        cp += npNew[vertex]
+        collection_points[vertex] = cp
+
+
+
+    interior = np.arange(start=0, stop=len(npNew), step=1)
+    interior = np.delete(interior, vertices, 0)
+
+    for point_idx in interior:
+
+        closest_segment = -1
+        closest_distance = np.inf
+        closest_perp = np.zeros((1,2))
+
+        p = npNew[point_idx]
+
+        tail = len(tour) - 1
+        head = 0
+        while head < len(tour):
+
+            start_idx = tour[tail]
+            end_idx = tour[head]
+
+            start = collection_points[start_idx]
+            end = collection_points[end_idx]
+
+            perp_len, perp_vec = linalg.closest_point(start, end, p)
+
+            if perp_len < closest_distance:
+                closest_segment = head
+                closest_distance = perp_len
+                closest_perp = perp_vec
+
+            tail = head
+            head += 1
+
+        tour.insert(closest_segment, point_idx)
+        collect_point = closest_perp - p
+
+        radius = np.linalg.norm(collect_point)
+
+        if radius > R:
+            collect_point /= radius
+            collect_point *= R
+
+        collect_point += p
+        collection_points[point_idx] = collect_point
+
+    tour.append(tour[0])
+
+        
+    # length calculations
+    total = 0
+    tail = 0
+    head = 1
+
+    while head < len(vertices):
+        start = collection_points[vertices[tail]]
+        stop = collection_points[vertices[head]]
+
+        total += np.linalg.norm(stop - start)
         tail += 1
         head += 1
 
-    return tourTotal
+    return total
 
 def findCommEnergy(eG, node):
 
     # data volume * communication cost
+    # Taken form wsnsims/core/Environment.py
     comm_cost = 2.0
 
     # get data volume (index 2) of node
@@ -264,23 +305,13 @@ def findCommEnergyCluster(eG, cluster):
         
     return sum
 
-def findMoveEnergy(eG, node):
-
-    # tour length * move cost
-    move_cost = 1.0
-    
-    tour_length = findTourLength(eG, node)
-
-    move_energy = tour_length * move_cost
-
-    return move_energy
-
-
 def findMoveEnergyCluster(eG, cluster):
 
     sum = 0
-    for node in cluster:
-        sum += findMoveEnergy(eG, node)
+    # Taken from wsnsims/core/Environment.py
+    move_cost = 1.0
+    
+    sum = computeTourCluster(eG, cluster) * move_cost
 
     return sum
 
@@ -288,28 +319,7 @@ def findMoveEnergyCluster(eG, cluster):
 def totalEnergyCluster(eG, cluster):
 
     # TotalCommEnergyCluster + TotalMoveEnergyCluster
-
-    sum = 0
-    for node in cluster:
-        sum += findMoveEnergyCluster(eG, node) + findCommEnergyCluster(eG, node)
-
-    return sum
-
-
-#eGT = ([3.45,7.99])
-
-eGT = np.array([3.45, 7.99])
-#nodeT = np.array([5.32, 9.11])
-#nodeX = np.array([13.12, 1.05])
-nodeT = ([5.32, 9.11])
-nodeX = ([13.12, 1.05])
-
-npClust = np.array([[5, 9], [13, 1]])
-
-print(findTourLengthCluster(eGT, npClust))
-
-sys.exit(0)
-
+    return findMoveEnergyCluster(eG, cluster) + findCommEnergyCluster(eG, cluster)
 
 
 # Sums the clusters aggregated data of x and Y
@@ -323,100 +333,6 @@ def summation(eG, cluster_x, cluster_y, clusterList):
         sum += mergedData
         
     return sum
-
-def getMotionEnergySegment(node1, node2):
-
-    #fancyU = 0.1 to 1J/m  - this is the delay factor
-    # using 0.5 as it's the middle
-    # need to find tour length between two node
-    # EuclidDist(node1, node2) - 2 * R
-    # R = 30
-
-    R = 30
-    #get coordinates for node1 and node2 to make math easier
-    node1_coords = list()
-    node2_coords = list()
-
-    node1_coords.append(node1[0])
-    node1_coords.append(node1[1])
-
-    node2_coords.append(node2[0])
-    node2_coords.append(node2[1])
-
-    distance = distance.euclidean(node1_coords, node2_coords)
-
-    total = distance - 2 * R
-
-    # result will be negative so we need the absolute value
-    return abs(true)
-
-def getMotionEnergyCluster(cluster):
-
-
-    return True
-
-## Get's total communication energy for segment 
-def getCommEnergySegment(node1, node2):
-
-    # data * P_c(R)
-    # P_c(R) = fancy-a + fancy Big B * R^fancy-othingy
-    #fancy-a = 100nj , nanojoules
-    #fancy big B= 0.1nJ/m^fancy-o
-    #fancy-o = 2in - inches
-    #R = 30m
-
-    # get data in bits
-    node1_data = node1[2] * 1048576
-    node2_data = node2[2] * 1048576
-
-    # range , 30m in paper
-    R = 30
-
-    # 2 in to meters
-    fancyO = 0.0508
-    mToFancyO = 1
-    
-    ## nanoJoules
-    fancyA = 0.000000001
-    fancyBigB = fancyA/1
-
-    # Joules it takes to transmit 1 bit
-    energyOneBit = 0.000002
-    
-    P_c = fancyA + (fancyBigB * (R**fancyO))
-
-    sum = (node1_data * P_c) + (node2_data * P_c) 
-
-    return sum
-
-
-def getCommEnergyCluster(cluster):
-
-
-
-    return True
-
-
-def getDelaySegment(node1, node2):
-
-
-
-    return True
-
-
-# Gets the data communcation energy
-# gets the communication energy
-# adds them up for a particular cluster
-def sumEnergyCluster(cluster):
-
-    energyCom = 0
-    energyMotion = 0
-
-    #temp holder for the data rate in each cluster
-    # current implementation has that as 2nd element (last) in array
-    clustDataRate = 0
-
-    return True
 
 # initialize and form segments into clusters
 def initClusters(segments):
@@ -433,13 +349,13 @@ def initClusters(segments):
 
 def mergeClusters(nodes):
 
-    return true
+    return True
 
 
 def hamilCycle(nodes):
 
 
-    return true
+    return True
 
 
 
@@ -475,32 +391,47 @@ for node in nodes:
 
 ## Phase 1 results should be
 # MDC Count = 5
-# Cluster 0 = S0, S1  - Tour length: 320
-# Cluster 1 = S2, S9, S10, S11 - Tour Length: 526
-# Cluster 2 = S6, S7, S8 - Tour Length: 470
-# Cluster 3 = S4, S5 - Tour Length: 330
+# Cluster 0 = S0, S1  - Energy: 320
+# Cluster 1 = S2, S9, S10, S11 - Energy:  526
+# Cluster 2 = S6, S7, S8 - Energy: 470
+# Cluster 3 = S4, S5 - Energy:  330
 #
 # Cluster 4 = S3 ## eG
 
 
-# startClusters is each node in it's own cluster
-# need to get energy for each cluster
-# i've got some methods above but bens' code might be easier
-# energy motion
-#nergy communication
+### DEBUGGING
+
+clust0 = list()
+clust1 = list()
+clust2 = list()
+clust3 = list()
+clust4 = list()
+
+clust0.append(S0)
+clust0.append(S1)
+
+clust1.append(S2)
+clust1.append(S9)
+clust1.append(S10)
+clust1.append(S11)
+
+clust2.append(S6)
+clust2.append(S7)
+clust2.append(S8)
+
+clust3.append(S4)
+clust3.append(S5)
+
+clust4.append(S3)
+
+print("Total energy cluster 0: ", totalEnergyCluster(eG, clust0))
+print("Total Energy cluster 1: ", totalEnergyCluster(eG, clust1))
+print("Total Energy Cluster 2: ", totalEnergyCluster(eG, clust2))
+print("Total energy cluster 3: ", totalEnergyCluster(eG, clust3))
+#print("total energy cluster 4: ", totalEnergyCluster(eG, clust4))
 
 
-
-# once energy is computed, need a way to compute tour path for cluster
-
-
-
-
-# then I need to add that tour path to the energy per cluster
-
-
-
-# Compare each cluster arbitrarily with energy and tour path to see if it's less than the lowest cluster calculations
+sys.exit(0)
 
 
 
