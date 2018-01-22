@@ -359,7 +359,37 @@ def hamilCycle(nodes):
 
 
 
-# main code here
+### phase2 code here
+
+def getAvgEnergyCluster(eG, cluster):
+
+
+    return True
+
+def getStanDevCluster(eG, cluster):
+
+
+    return True
+
+
+def getCoreOfMass(eG, cluster):
+
+
+    return True
+
+
+def moveRPIn(cluster):
+
+
+    return True
+
+
+def moveRPOut(cluster):
+
+
+    return True
+
+
 
 # starting out, center cluster is at eG
 eG = findEG(nodes)
