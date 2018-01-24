@@ -195,10 +195,12 @@ def computeTourCluster(eG, cluster):
     # radio_range default = 30
     R = 30
 
-    # Create convex hull object
-    hull = sp.ConvexHull(new, qhull_options='QJ Pp')
-
-    vertices = hull.vertices
+    if len(new) == 2:
+        vertices = np.array([0,1])
+    else:
+        # Create convex hull object
+        hull = sp.ConvexHull(new, qhull_options='QJ Pp')
+        vertices = hull.vertices
 
     tour = list(vertices)
 
@@ -293,7 +295,8 @@ def findCommEnergy(eG, node):
     # get data volume (index 2) of node
     data_volume = node[2]
     
-    comm_energy = data_volume * comm_cost
+    #comm_energy = data_volume * comm_cost
+    comm_energy = (10*data_volume)/5
     
     return comm_energy
 
@@ -309,7 +312,7 @@ def findMoveEnergyCluster(eG, cluster):
 
     sum = 0
     # Taken from wsnsims/core/Environment.py
-    move_cost = 1.0
+    move_cost = 1
     
     sum = computeTourCluster(eG, cluster) * move_cost
 
@@ -347,16 +350,56 @@ def initClusters(segments):
 
 
 
-def mergeClusters(nodes):
+def mergeClusters(listOfClusters):
 
+    mdc_count = 5
+    numClusters = mdc_count - 1
+    k = numClusters
+
+    mergedCluster = list()
+    finalCluster = list()
+
+    sum = 0
+    round = 0
+    lowest = 0
+
+    #do/while
+    while True:
+        for clust_x in listOfClusters:
+            for clust_y in listOfClusters:
+
+                sum = totalEnergyCluster(eG, clust_x) + totalEnergyCluster(eG, clust_y)
+
+              #  print("Energy of ", clust_x, " and ", clust_y, ": ", sum)
+                # make sure they aren't the same
+                if clust_x == clust_y:
+                    continue
+                if round == 0:
+                    lowest = sum
+                    mergedCluster.append(clust_x)
+                    mergedCluster.append(clust_y)
+                else:
+                    if sum < lowest:
+                        lowest = sum
+                        # Clear out merged clusters
+                        mergedCluster.clear()
+                        mergedCluster.append(clust_x)
+                        mergedCluster.append(clust_y)
+            round = round + 1
+        k = k-1
+        if k == 0:
+            break
+    
+    return mergedCluster
+
+def printClusters(cluster_list):
+
+    i = 0
+    for clust in cluster_list:
+        print("Cluster", i, ":", clust)
+        i += 1
+        
     return True
-
-
-def hamilCycle(nodes):
-
-
-    return True
-
 
 
 ### phase2 code here
@@ -414,9 +457,9 @@ singleClusterList = list()
 # Add each node to it's own cluster
 for node in nodes:
     cluster = list()
+   # cluster.append(eG)
     cluster.append(node)
     # append eG to each cluster per the paper
-    cluster.append(eG)
     singleClusterList.append(cluster)
 
 ## Phase 1 results should be
@@ -454,89 +497,18 @@ clust3.append(S5)
 
 clust4.append(S3)
 
-print("Total energy cluster 0: ", totalEnergyCluster(eG, clust0))
-print("Total Energy cluster 1: ", totalEnergyCluster(eG, clust1))
-print("Total Energy Cluster 2: ", totalEnergyCluster(eG, clust2))
-print("Total energy cluster 3: ", totalEnergyCluster(eG, clust3))
-#print("total energy cluster 4: ", totalEnergyCluster(eG, clust4))
+####
 
-
-sys.exit(0)
-
-
-
-
-
-
-# k in the paper
-mdcCount = 5
-
-#k - 1 in the paper
-numClusters = mdcCount -1
-
-k = numClusters
 
 listOfClusters = list()
 cenClust = list()
 cenClust.append(S3)
 
-    
-# Simulating a do/while loop
-lowest = 0
-while True:
-    sum = 0
-    round = 0
-    energyCurrCluster = 0
-    mergedCluster = list()
-
-    # brute forcing every combination of clusters
-    for clust_x in singleClusterList:
-        for clust_y in singleClusterList:
-            # avoid comparing same cluster to itself
-            if clust_x == clust_y:
-                continue
-            
-            ## Loop for summation
-            if round == 0:
-                lowest = summation(eG, clust_x, clust_y, singleClusterList)
-                continue
-
-            # Get the energy of the current cluster
-            
-            # This gets the energy summation for a cluster
-            sum = summation(eG, clust_x, clust_y, singleClusterList)
-
-            print("Cluster pair: ", clust_x, clust_y, " sum: ", sum, ", lowest: ", lowest)
-            
-            if sum < lowest:
-                # New pair is found, clear out old list
-                mergedCluster.append(clust_x)
-                mergedCluster.append(clust_y)
-                lowest = sum
-        
-        round += 1
-        
-    listOfClusters.append(mergedCluster)
-
-    # We're done marking clusters for merging
-    mergedCluster.clear()
-    k -= 1
-    if k == 0:
-        break
-
-    
-# Just to make sure center cluster is last in list
-listOfClusters.append(cenClust)
-
-#for clust in listOfClusters:
- ###   print("Cluster: ", clust)
-
-    
+#printClusters(singleClusterList)
+print(mergeClusters(singleClusterList))
 
 
-            
-        
-        
+          
         
 
 
