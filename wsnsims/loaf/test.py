@@ -368,6 +368,7 @@ def mergeClusters(listOfClusters):
         for clust_x in listOfClusters:
             for clust_y in listOfClusters:
 
+                # Get the total total Energy of each cluster
                 sum = totalEnergyCluster(eG, clust_x) + totalEnergyCluster(eG, clust_y)
 
               #  print("Energy of ", clust_x, " and ", clust_y, ": ", sum)
@@ -375,22 +376,30 @@ def mergeClusters(listOfClusters):
                 if clust_x == clust_y:
                     continue
                 if round == 0:
+                    # first round, first set is lowest by default
                     lowest = sum
+                    #"Marking" clusters for merging
                     mergedCluster.append(clust_x)
                     mergedCluster.append(clust_y)
+                    round += 1
                 else:
                     if sum < lowest:
                         lowest = sum
-                        # Clear out merged clusters
+                        # "unmark" clusters
                         mergedCluster.clear()
+                        # "Mark" new clusters
                         mergedCluster.append(clust_x)
                         mergedCluster.append(clust_y)
-            round = round + 1
-        k = k-1
+                # Add the merged to the final cluster
+            for clust in mergedCluster:
+                finalCluster.append(clust)
+                    
+            round -= 1
+        k -= 1
         if k == 0:
             break
     
-    return mergedCluster
+    return finalCluster
 
 def printClusters(cluster_list):
 
