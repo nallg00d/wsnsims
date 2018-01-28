@@ -21,6 +21,13 @@ from wsnsims.loaf.cluster import LoafVirtualCluster
 from wsnsims.loaf.cluster import LoafVirtualHub
 from wsnsims.loaf.energy import LOAFEnergyModel
 from wsnsims.tocs.cluster import combine_clusters
+from wsnsims.flower.cell import Cell
+
+import pdb
+import sys
+
+
+
 
 logger = logging.getLogger(__name__)
 warnings.filterwarnings('error')
@@ -39,20 +46,53 @@ class LOAF(object):
         """
 
         ### Debugs for paper ####
+        S0 = np.array([9.0,13.0])
+        S1 = np.array([4.0,12.0])
+        S2 = np.array([2.0,9.0])
+        S3 = np.array([7.0,9.0])
+        S4 = np.array([12.0,9.0])
+        S5 = np.array([17.0,9.0])
+        S6 = np.array([17.0,4.0])
+        S7 = np.array([14.0,0.0])
+        S8 = np.array([11.0,4.0])
+        S9 = np.array([5.0,0.0])
+        S10 = np.array([5.0,6.0])
+        S11 = np.array([0.0,4.0])
 
+        # Data Volume Table
+        S0_DataVol = np.array([0, 34])
+        S1_DataVol = np.array([1,31])
+        S2_DataVol = np.array([2,29])
+        S3_DataVol = np.array([3,50])
+        S4_DataVol = np.array([4,17])
+        S5_DataVol = np.array([5,13])
+        S6_DataVol = np.array([6,1])
+        S7_DataVol = np.array([7,2])
+        S8_DataVol = np.array([8,7])
+        S9_DataVol = np.array([9,1])
+        S10_DataVol = np.array([10,22])
+        S11_DataVol = np.array([11,1])
+
+        # List of initial clusters and data volumes
+        self.dataVol = list()
+        self.dataVol.append(S0_DataVol)
+        self.dataVol.append(S1_DataVol)
+        self.dataVol.append(S2_DataVol)
+        self.dataVol.append(S3_DataVol)
+        self.dataVol.append(S4_DataVol)
+        self.dataVol.append(S5_DataVol)
+        self.dataVol.append(S6_DataVol)
+        self.dataVol.append(S7_DataVol)
+        self.dataVol.append(S8_DataVol)
+        self.dataVol.append(S9_DataVol)
+        self.dataVol.append(S10_DataVol)
+        self.dataVol.append(S11_DataVol)
+
+        
+        self.env = environment
+
+        #locs = np.random.rand(self.env.segment_count, 2) * self.env.grid_height
         locs = list()
-        S0 = [9,13]
-        S1 = [4,12]
-        S2 = [2,9]
-        S3 = [7,9]
-        S4 = [12,9]
-        S5 = [17,9]
-        S6 = [17,4]
-        S7 = [14,0]
-        S8 = [11,4]
-        S9 = [5,0]
-        S10 = [5,6]
-        S11 = [0,4]
 
         locs.append(S0)
         locs.append(S1)
@@ -66,17 +106,16 @@ class LOAF(object):
         locs.append(S9)
         locs.append(S10)
         locs.append(S11)
+
+        locs = np.array(locs)
         
-        self.env = environment
-
-#        locs = np.random.rand(self.env.segment_count, 2) * self.env.grid_height
-
+        # For the node within 
         self.segments = [segment.Segment(loc) for loc in locs]
 
         self.grid = grid.Grid(self.segments, self.env)
         self.cells = list(self.grid.cells())
 
-        #segment_centroid = np.mean(locs, axis=0)
+#        segment_centroid = np.mean(locs, axis=0)
 
         # setting to S3 for testing
         segment_centroid = np.array(S3)
@@ -679,13 +718,13 @@ class LOAF(object):
     def initClusters(self):
 
         # List of LOAFCluster = list[LOAFCluster]
-        listOfClusters = list()
         clustID = 0
-        # Create centroid segment then add to cluster first
-        S3 = [7,9]
-        center = segment.Segment(S3)
-        for seg in self.segments:
 
+        for seg in self.segments:
+            if seg.segment_id == 3:
+                center = seg
+
+        for seg in self.segments:
             if seg.segment_id == 3:
                 continue
             
@@ -694,19 +733,39 @@ class LOAF(object):
             clust.add(center)
             clust.add(seg)
             clustID += 1
-            listOfClusters.append(clust)
+            self.clusters.append(clust)
             
-        return listOfClusters
+        return True
 
     def printClusters(self):
+        
         for clust in self.clusters:
             print(clust)
 
         return True
 
-    def printClusterNodes(self, initClusters):
-        for clust in initClusters:
+    def printSegmentLocation(self):
+
+        for seg in self.segments:
+            print("Segment", seg.segment_id, "coordinates:",seg.location)
+
+        return True
+
+    # change this to self.clusters eventually
+    def printClusterNodes(self):
+        for clust in self.clusters:
             print("Cluster", clust.id, "nodes:", clust.nodes)
+
+        return True
+
+    def printClusterSegLocation(self):
+
+        for clust in self.clusters:
+            for seg in clust.nodes:
+                print("Cluster:",clust.id,"Node:",seg.segment_id, "Coord:", seg.location)
+
+            print("----")
+        
 
         return True
     
@@ -714,14 +773,43 @@ class LOAF(object):
 
         return True
 
+    def makeCells(self):
+
+
+        return True
+
     def run(self):
 
         # Get initial segments into a cluster
-        initClust = self.initClusters()
-        self.printClusterNodes(initClust)
-        
+        self.initClusters()
+#        self.printSegmentLocation()
+#        self.printClusterNodes()
+#        pdb.set_trace()
+#        self.printClusterSegLocation()
+# Print cluster with their segments and the segments coordiantes
+#        self.printClusterSegLocation()
+
+#        for cell in self.cells:
+ #           for seg in cell.segments:
+  #              print("Cell:", cell.cell_id, "Cluster:", cell.cluster_id, "Segment:", seg.segment_id, "Coords:", seg.location)
+
+
+        #get cell based on coordinates, then assign cluster_id 
+        self.grid.cell(9,13).cluster_id = 2
+
+        # assign cell to cluster
+        print(self.clusters[0].cells)
+        print(self.clusters[1].cells)
+        print(type(self.clusters[0]))
+        print(self.total_cluster_energy(self.clusters[0]))
 
         sys.exit(0)
+        self.clusters[0].add(self.grid.cell(9,13))
+        print(self.grid.cell(9,13).cluster_id)
+        print(self.clusters[0].cells)
+            
+        sys.exit(0)    
+        
         sim = self.compute_paths()
         runner = loaf_runner.LOAFRunner(sim, self.env)
         logger.debug("Maximum comms delay: {}".format(

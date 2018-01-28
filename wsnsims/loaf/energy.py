@@ -1,4 +1,5 @@
 import itertools
+import pdb
 
 import numpy as np
 
@@ -31,9 +32,12 @@ class LOAFEnergyModel(object):
         :rtype: pq.bit
         """
 
+#        pdb.set_trace()
         if not intercluster_only:
             # Handle the intra-cluster data volume
             cell_pairs = itertools.permutations(cluster.cells, 2)
+
+            # Looping through list of cell_pairs, each is a segment object
             internal_volume = np.sum(
                 [cell_volume(s, d, self.env) for s, d in cell_pairs])
         else:
@@ -154,6 +158,7 @@ class LOAFEnergyModel(object):
         # if cluster_id in self._ids_to_comms_energy:
         #     return self._ids_to_comms_energy[cluster_id]
 
+#        pdb.set_trace()
         if clust == self.sim.hub:
             data_volume = self.hub_data_volume(clust)
         else:

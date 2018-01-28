@@ -1,6 +1,7 @@
 import itertools
 
 from wsnsims.core.data import segment_volume
+import pdb
 
 data_memo = {}
 
@@ -20,6 +21,7 @@ def cell_volume(src, dst, env):
     if (src, dst) in data_memo:
         return data_memo[(src, dst)]
 
+#    pdb.set_trace()
     segment_pairs = itertools.product(src.segments, dst.segments)
     total_volume = 0.  # pq.bit
     for src, dst in segment_pairs:
