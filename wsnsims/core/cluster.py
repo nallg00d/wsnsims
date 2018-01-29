@@ -7,6 +7,7 @@ from wsnsims.core import tour, point
 from wsnsims.core.orderedset import OrderedSet
 
 from wsnsims.core import linalg
+import pdb
 
 logger = logging.getLogger(__name__)
 
@@ -156,6 +157,7 @@ class BaseCluster(object):
 
 
 def closest_nodes(cluster_1, cluster_2, dist=None):
+#    pdb.set_trace()
     if isinstance(cluster_1, BaseCluster):
         node_list_1 = cluster_1.nodes
     else:

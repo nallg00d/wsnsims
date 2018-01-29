@@ -495,6 +495,7 @@ class LOAF(object):
                         r, c_least)
 
     def total_cluster_energy(self, c):
+        #pdb.set_trace()
         energy = self.energy_model.total_energy(c.cluster_id)
         logger.debug("%s requires %s to traverse.", c, energy)
         return energy
@@ -715,26 +716,79 @@ class LOAF(object):
         return self
 
     # Get all segments into their own cluster
+    ## FIX THIS!! NEED TO ADD CELLS AND NOT SEGMETNS
+    # cell.segments.append(segment)
+    
     def initClusters(self):
 
-        # List of LOAFCluster = list[LOAFCluster]
-        clustID = 0
+        cellsInUse = list()
+        S0_cell = self.grid.cell(9,13)
+        S1_cell = self.grid.cell(4,12)
+        S2_cell = self.grid.cell(2,9)
+        S3_cell = self.grid.cell(7,9)
+        S4_cell = self.grid.cell(12,9)
+        S5_cell = self.grid.cell(17,9)
+        S6_cell = self.grid.cell(17,4)
+        S7_cell = self.grid.cell(14,0)
+        S8_cell = self.grid.cell(11,4)
+        S9_cell = self.grid.cell(5,0)
+        S10_cell = self.grid.cell(5,6)
+        S11_cell = self.grid.cell(0,4)
 
-        for seg in self.segments:
-            if seg.segment_id == 3:
-                center = seg
+        S0_cell.cluster_id = 0
+        S1_cell.cluster_id = 1
+        S2_cell.cluster_id = 2
+        S3_cell.cluster_id = 3
+        S4_cell.cluster_id = 4
+        S5_cell.cluster_id = 5
+        S6_cell.cluster_id = 6
+        S7_cell.cluster_id = 7
+        S8_cell.cluster_id = 8
+        S9_cell.cluster_id = 9
+        S10_cell.cluster_id = 10
+        S11_cell.cluster_id = 11
 
-        for seg in self.segments:
-            if seg.segment_id == 3:
-                continue
-            
+        cellsInUse.append(S0_cell)
+        cellsInUse.append(S1_cell)
+        cellsInUse.append(S2_cell)
+        cellsInUse.append(S3_cell)
+        cellsInUse.append(S4_cell)
+        cellsInUse.append(S5_cell)
+        cellsInUse.append(S6_cell)
+        cellsInUse.append(S7_cell)
+        cellsInUse.append(S8_cell)
+        cellsInUse.append(S9_cell)
+        cellsInUse.append(S10_cell)
+        cellsInUse.append(S11_cell)
+
+        # need to add segments to cell
+
+        # Loop through 0 to end of segments
+        # Add eG as first segment
+        # add segmetn
+        for i in range(0,len(self.segments)):
+            cellsInUse[i].segments.append(self.segments[3])
+            cellsInUse[i].segments.append(self.segments[i])
+
+        # need to add cell to cluster
+        for cell in cellsInUse:
             clust = LoafCluster(self.env)
-            clust.id = clustID
-            clust.add(center)
-            clust.add(seg)
-            clustID += 1
+            clust.add(cell)
             self.clusters.append(clust)
-            
+        
+#        print(S0_cell)
+ #       print(S1_cell)
+  #      print(S2_cell)
+   #     print(S3_cell)
+    #    print(S4_cell)
+     #   print(S5_cell)
+      #  print(S6_cell)
+       # print(S7_cell)
+       # print(S8_cell)
+       # print(S9_cell)
+       # print(S10_cell)
+       # print(S11_cell)
+        
         return True
 
     def printClusters(self):
@@ -773,6 +827,11 @@ class LOAF(object):
 
         return True
 
+    def print_cluster_cells(self):
+
+        for clust in self.clusters:
+            print("Cluster", clust.id, ":", "Cells:", clust.cells)
+                
     def makeCells(self):
 
 
@@ -794,22 +853,16 @@ class LOAF(object):
   #              print("Cell:", cell.cell_id, "Cluster:", cell.cluster_id, "Segment:", seg.segment_id, "Coords:", seg.location)
 
 
-        #get cell based on coordinates, then assign cluster_id 
-        self.grid.cell(9,13).cluster_id = 2
 
-        # assign cell to cluster
-        print(self.clusters[0].cells)
-        print(self.clusters[1].cells)
-        print(type(self.clusters[0]))
-        print(self.total_cluster_energy(self.clusters[0]))
 
-        sys.exit(0)
-        self.clusters[0].add(self.grid.cell(9,13))
-        print(self.grid.cell(9,13).cluster_id)
-        print(self.clusters[0].cells)
-            
-        sys.exit(0)    
+        #print(self.total_cluster_energy(self.clusters[0]))
+#        self.printClusters()
+
+
+       ## Now that clusters are properly initialized, we can add the ISDVa to each cluster based on the paper
         
+        sys.exit(0)
+                
         sim = self.compute_paths()
         runner = loaf_runner.LOAFRunner(sim, self.env)
         logger.debug("Maximum comms delay: {}".format(

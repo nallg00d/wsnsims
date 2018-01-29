@@ -36,6 +36,7 @@ class LOAFEnergyModel(object):
         if not intercluster_only:
             # Handle the intra-cluster data volume
             cell_pairs = itertools.permutations(cluster.cells, 2)
+      #      pdb.set_trace()
 
             # Looping through list of cell_pairs, each is a segment object
             internal_volume = np.sum(
@@ -162,6 +163,7 @@ class LOAFEnergyModel(object):
         if clust == self.sim.hub:
             data_volume = self.hub_data_volume(clust)
         else:
+#            pdb.set_trace()
             data_volume = self.cluster_data_volume(clust)
 
         energy = data_volume * self.env.comms_cost
@@ -218,6 +220,7 @@ class LOAFEnergyModel(object):
         :rtype: pq.J
         """
         clust = self._find_cluster(cluster_id)
+#        pdb.set_trace()
         energy = self.total_comms_energy(clust)
         energy += self.total_movement_energy(clust)
         return energy
