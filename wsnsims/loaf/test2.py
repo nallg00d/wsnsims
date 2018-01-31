@@ -834,7 +834,12 @@ class LOAF(object):
 
         #Loop through and get 2 non repeating clusters
         cluster_perms = itertools.permutations(self.clusters,2)
-
+        toMerge = list()
+        round = 0
+        lowest = 0
+        total = 0
+        listOfNewClust = list()
+        
         # Loop through permutation object with 2 elemnts
         # Get total data Volume on each
         # If first round, then add those two data volumes, and they are the lowest - use the cells
@@ -843,10 +848,35 @@ class LOAF(object):
         # add both to a list as 'marking' them as candidates to merge
         # Might have to do this at the cell level since clusters contain cells
         # Get cell data from cluste add to list
-        
+        for x, y in cluster_perms:
+            # Create new cluster
+            newClust = LoafCluster(self.env)
+            if round == 0:
+                lowest = self.total_cluster_energy(x) + self.total_cluster_energy(y)
+                round += 1
+                continue
+
+            total = self.total_cluster_energy(x) + self.total_cluster_energy(y)
+
+            if total < lowest:
+                lowest = total
+                toMerge.clear()
+                toMerge.append(x)
+                toMerge.append(y)
+
+            for clust in toMerge:
+                # newClust...
+                # Get cell to add to cluster
+                # cell = clust.?
+                #Add cell to cluster
+                # clust.add(cell)
+
+            listOfNewClust.append(newClust)
+            
+            round += 1
         
 
-        return True
+        return listOfNewClust
 
     def print_cluster_cells(self):
 
