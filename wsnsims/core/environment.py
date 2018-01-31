@@ -2,7 +2,7 @@ class Environment(object):
     def __init__(self):
         # Common things to change
         self.segment_count = 30
-        self.mdc_count = 9
+        self.mdc_count = 12
         self.isdva = 4.  # megabit
         self.isdvsd = 3.
         self.comms_range = 100.  # meters

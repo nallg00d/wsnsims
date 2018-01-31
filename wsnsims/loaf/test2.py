@@ -761,8 +761,20 @@ class LOAF(object):
         cellsInUse.append(S10_cell)
         cellsInUse.append(S11_cell)
 
-        # need to add segments to cell
-
+        # Manually add segment volume to each segment
+        self.segments[0].volume = 34
+        self.segments[1].volume = 31
+        self.segments[2].volume = 29
+        self.segments[3].volume = 50
+        self.segments[4].volume = 17
+        self.segments[5].volume = 13
+        self.segments[6].volume = 1
+        self.segments[7].volume = 2
+        self.segments[8].volume = 7
+        self.segments[9].volume = 1
+        self.segments[10].volume = 22
+        self.segments[11].volume = 1
+        
         # Loop through 0 to end of segments
         # Add eG as first segment
         # add segmetn
@@ -775,19 +787,7 @@ class LOAF(object):
             clust = LoafCluster(self.env)
             clust.add(cell)
             self.clusters.append(clust)
-        
-#        print(S0_cell)
- #       print(S1_cell)
-  #      print(S2_cell)
-   #     print(S3_cell)
-    #    print(S4_cell)
-     #   print(S5_cell)
-      #  print(S6_cell)
-       # print(S7_cell)
-       # print(S8_cell)
-       # print(S9_cell)
-       # print(S10_cell)
-       # print(S11_cell)
+    
         
         return True
 
@@ -797,6 +797,13 @@ class LOAF(object):
             print(clust)
 
         return True
+
+    def printSegVol(self):
+        for clust in self.clusters:
+            for seg in clust.segments:
+                print(seg, "volume:", seg.volume)
+
+                
 
     def printSegmentLocation(self):
 
@@ -825,6 +832,20 @@ class LOAF(object):
     
     def mergeClusters(self):
 
+        #Loop through and get 2 non repeating clusters
+        cluster_perms = itertools.permutations(self.clusters,2)
+
+        # Loop through permutation object with 2 elemnts
+        # Get total data Volume on each
+        # If first round, then add those two data volumes, and they are the lowest - use the cells
+        # Go after and compare data volumes of both, use the cells
+        # if lower than previous
+        # add both to a list as 'marking' them as candidates to merge
+        # Might have to do this at the cell level since clusters contain cells
+        # Get cell data from cluste add to list
+        
+        
+
         return True
 
     def print_cluster_cells(self):
@@ -841,25 +862,12 @@ class LOAF(object):
 
         # Get initial segments into a cluster
         self.initClusters()
-#        self.printSegmentLocation()
-#        self.printClusterNodes()
-#        pdb.set_trace()
-#        self.printClusterSegLocation()
-# Print cluster with their segments and the segments coordiantes
-#        self.printClusterSegLocation()
 
-#        for cell in self.cells:
- #           for seg in cell.segments:
-  #              print("Cell:", cell.cell_id, "Cluster:", cell.cluster_id, "Segment:", seg.segment_id, "Coords:", seg.location)
+#        self.printSegVol()
 
+        self.total_cluster_energy(self.clusters[0])
+        self.total_cluster_energy(self.clusters[1])
 
-
-
-        #print(self.total_cluster_energy(self.clusters[0]))
-#        self.printClusters()
-
-
-       ## Now that clusters are properly initialized, we can add the ISDVa to each cluster based on the paper
         
         sys.exit(0)
                 
